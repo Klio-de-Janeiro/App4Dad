@@ -1,0 +1,30 @@
+name: Build and test
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows-and-android:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK
+        shell: pwsh
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Build and test both apps
+        shell: pwsh
+        run: ./scripts/build.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: App4Dad-Windows-and-Android
+          path: |
+            dist/App4Dad-Windows-x64.zip
+            dist/App4Dad-Android.apk
+          retention-days: 30
